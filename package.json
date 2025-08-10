@@ -1,0 +1,32 @@
+{
+  "name": "localization-cli",
+  "version": "1.0.0",
+  "description": "Advanced AI-powered localization CLI",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js",
+    "dev": "node bot.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "inquirer": "^8.2.6",
+    "chalk": "^4.1.2",
+    "cli-progress": "^3.12.0",
+    "openai": "^4.28.4",
+    "axios": "^1.6.7"
+  },
+  "keywords": [
+    "translation",
+    "localization",
+    "i18n",
+    "ios",
+    "xcstrings",
+    "ai",
+    "gemini",
+    "openai",
+    "claude",
+    "deepseek"
+  ],
+  "author": "Enes UTKU",
+  "license": "MIT"
+}
