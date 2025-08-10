@@ -10,7 +10,8 @@ const config = {
     gemini: process.env.GEMINI_API_KEY,
     openai: process.env.OPENAI_API_KEY,
     claude: process.env.CLAUDE_API_KEY,
-    deepseek: process.env.DEEPSEEK_API_KEY
+    deepseek: process.env.DEEPSEEK_API_KEY,
+    replicate: process.env.REPLICATE_API_TOKEN
   },
   
   // File Settings
@@ -46,6 +47,9 @@ const config = {
     deepseek: {
       baseURL: 'https://api.deepseek.com/v1',
       model: 'deepseek-chat'
+    },
+    replicate: {
+      model: 'lucataco/seed-x-ppo:bd6fdc731bd97a7dc3ea84285479567a3d40165d851bc7251122defd30372e8c'
     }
   },
   

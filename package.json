@@ -8,12 +8,13 @@
     "dev": "node bot.js"
   },
   "dependencies": {
-    "dotenv": "^16.4.5",
-    "inquirer": "^8.2.6",
+    "axios": "^1.6.7",
     "chalk": "^4.1.2",
     "cli-progress": "^3.12.0",
+    "dotenv": "^16.4.5",
+    "inquirer": "^8.2.6",
     "openai": "^4.28.4",
-    "axios": "^1.6.7"
+    "replicate": "^1.0.1"
   },
   "keywords": [
     "translation",
