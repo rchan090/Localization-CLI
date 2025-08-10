@@ -2,6 +2,12 @@
 
 A command-line tool that auto-translates iOS localization files via multiple AI providers, supporting 70+ languages with flexible source language options.
 
+
+
+https://github.com/user-attachments/assets/bfa71785-e31d-4e43-8177-fe1478653912
+
+
+
 ## ✨ Features
 
 - 🤖 **Multiple AI Providers**: Gemini, ChatGPT, Claude, DeepSeek
