@@ -10,6 +10,8 @@ A command-line tool that auto-translates iOS localization files via multiple AI 
 - ⚙️ **Easy Configuration**: Environment variables and automatic file path detection
 - 📊 **Real-time Progress**: Live translation progress with detailed statistics
 
+https://github.com/user-attachments/assets/bfa71785-e31d-4e43-8177-fe1478653912
+
 ## 🚀 Quick Start
 
 ### Step 1: Create Localization File in Xcode
