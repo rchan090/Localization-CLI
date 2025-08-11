@@ -11,7 +11,9 @@ const config = {
     openai: process.env.OPENAI_API_KEY,
     claude: process.env.CLAUDE_API_KEY,
     deepseek: process.env.DEEPSEEK_API_KEY,
-    replicate: process.env.REPLICATE_API_TOKEN
+    replicate: process.env.REPLICATE_API_TOKEN,
+    perplexity: process.env.PERPLEXITY_API_KEY,
+    grok: process.env.GROK_API_KEY
   },
   
   // File Settings
@@ -21,6 +23,9 @@ const config = {
   batchSize: parseInt(process.env.BATCH_SIZE) || 50,
   defaultTargetLanguage: process.env.DEFAULT_TARGET_LANGUAGE || 'fr',
   defaultSourceLanguage: process.env.DEFAULT_SOURCE_LANGUAGE || 'en',
+  
+  // Application Context (helps improve translation accuracy)
+  appContext: process.env.APP_CONTEXT || '',
   
   // Quality Control
   // (Basic validation features removed for simplicity)
@@ -50,6 +55,14 @@ const config = {
     },
     replicate: {
       model: 'lucataco/seed-x-ppo:bd6fdc731bd97a7dc3ea84285479567a3d40165d851bc7251122defd30372e8c'
+    },
+    perplexity: {
+      baseURL: 'https://api.perplexity.ai',
+      model: 'sonar'
+    },
+    grok: {
+      baseURL: 'https://api.x.ai/v1',
+      model: 'grok-4'
     }
   },
   

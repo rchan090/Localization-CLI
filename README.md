@@ -4,10 +4,12 @@ A command-line tool that auto-translates iOS localization files via multiple AI 
 
 ## ✨ Features
 
-- 🤖 **Multiple AI Providers**: Gemini, ChatGPT, Claude, DeepSeek
+- 🤖 **Multiple AI Providers**: Gemini, ChatGPT, Claude, DeepSeek, Perplexity, Grok
 - 🌍 **70+ Languages**: French, German, Spanish, Italian, Portuguese, Turkish, Chinese, and many more
 - 🎯 **Interactive CLI**: Beautiful progress bars, colorful output, and user-friendly prompts
 - ⚙️ **Easy Configuration**: Environment variables and automatic file path detection
+- 🎯 **Smart Context**: Application context helps AI choose more accurate translations
+- 🔄 **Auto-Retry**: Failed chunks are automatically retried with configurable attempts
 - 📊 **Real-time Progress**: Live translation progress with detailed statistics
 
 https://github.com/user-attachments/assets/bfa71785-e31d-4e43-8177-fe1478653912
@@ -71,6 +73,9 @@ XCSTRINGS_FILE_PATH=/path/to/your/Localizable.xcstrings
 # Set default languages
 DEFAULT_SOURCE_LANGUAGE=en
 DEFAULT_TARGET_LANGUAGE=de
+
+# Set app context for better translations (optional)
+APP_CONTEXT=travel booking app
 ```
 
 ### Step 5: Run Translation
@@ -78,6 +83,46 @@ DEFAULT_TARGET_LANGUAGE=de
 ```bash
 # Interactive mode (will ask for languages)
 node bot.js
+```
+
+## 🎯 Smart Context Feature
+
+The CLI now supports **application context** to improve translation accuracy. When you provide context about your app (e.g., "travel booking app", "fitness tracker", "e-commerce platform"), the AI:
+
+- Chooses more appropriate terminology for your domain
+- Maintains consistent tone and style across translations
+- Better understands technical terms and UI elements specific to your app type
+
+**Setup:**
+1. Set `APP_CONTEXT` in your `.env` file, or
+2. Leave it empty to be prompted interactively when running the bot
+
+**Examples:**
+- `"travel booking app"` → Better translations for booking, hotels, flights
+- `"fitness tracker"` → More accurate fitness and health terminology  
+- `"e-commerce platform"` → Proper shopping and payment terms
+- `"social media app"` → Appropriate social interaction language
+
+## 🔄 Auto-Retry Feature
+
+The CLI automatically retries failed translation chunks to improve success rates:
+
+- **Default Behavior**: Each failed chunk is retried up to 3 times
+- **Configurable**: Set `RETRY_COUNT` in your `.env` file (1-10 recommended)
+- **Smart Delays**: Adds delays between retries to avoid rate limiting
+- **Clear Logging**: Shows retry attempts and final failure reasons
+
+**Configuration:**
+```env
+RETRY_COUNT=3                # Number of retry attempts (default: 3)
+REQUEST_DELAY=1000          # Delay between retries in ms (default: 1000)
+```
+
+**What You'll See:**
+```
+⚠️  Chunk 9 failed (attempt 1/3): API rate limit exceeded
+ℹ️  Retrying chunk 9 (attempt 2/3)
+✅ Chunk 9 translation successful on retry
 ```
 
 ## 🔧 Troubleshooting

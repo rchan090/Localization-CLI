@@ -1,11 +1,11 @@
-// providers/claude.js
+// providers/grok.js
 const BaseProvider = require('./base');
 
-class ClaudeProvider extends BaseProvider {
+class GrokProvider extends BaseProvider {
   constructor(config) {
     super(config);
-    this.apiKey = config.apiKeys.claude;
-    this.endpoint = config.endpoints.claude;
+    this.apiKey = config.apiKeys.grok;
+    this.endpoint = config.endpoints.grok;
   }
 
   async translate(items, targetLanguage, sourceLanguage = 'English') {
@@ -18,28 +18,28 @@ class ClaudeProvider extends BaseProvider {
     const axios = require('axios');
     
     const response = await axios.post(
-      `${this.endpoint.baseURL}/messages`,
+      `${this.endpoint.baseURL}/chat/completions`,
       {
         model: this.endpoint.model,
-        max_tokens: 4000,
         messages: [
           {
             role: 'user',
             content: prompt
           }
-        ]
+        ],
+        temperature: 0.3,
+        max_tokens: 4000
       },
       {
         headers: {
-          'x-api-key': this.apiKey,
-          'Content-Type': 'application/json',
-          'anthropic-version': '2023-06-01'
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json'
         }
       }
     );
 
-    return response.data.content[0].text;
+    return response.data.choices[0].message.content;
   }
 }
 
-module.exports = ClaudeProvider;
+module.exports = GrokProvider;

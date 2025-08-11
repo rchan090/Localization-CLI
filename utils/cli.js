@@ -151,6 +151,33 @@ class CLIUtils {
     return filePath.trim();
   }
 
+  static async promptForAppContext() {
+    console.log(chalk.yellow('\n📱 Application Context Setup'));
+    console.log(chalk.gray('Providing context about your app helps AI choose more accurate translations.'));
+    console.log(chalk.gray('Examples: "travel booking app", "fitness tracker", "e-commerce platform", "social media app"\n'));
+    
+    const { appContext } = await inquirer.prompt([
+      {
+        type: 'input',
+        name: 'appContext',
+        message: '🎯 Describe your app (or press Enter to skip):',
+        validate: (input) => {
+          // Allow empty input (skip)
+          return true;
+        }
+      }
+    ]);
+
+    const trimmed = appContext.trim();
+    if (trimmed) {
+      console.log(chalk.green(`✓ App context: ${trimmed}\n`));
+    } else {
+      console.log(chalk.gray('⏩ Skipping app context (generic translations will be used)\n'));
+    }
+
+    return trimmed;
+  }
+
   static printStats(stats) {
     console.log(chalk.cyan('\n📊 Translation Statistics:'));
     console.log(chalk.gray('━'.repeat(30)));

@@ -10,7 +10,7 @@ class GeminiProvider extends BaseProvider {
   }
 
   async translate(items, targetLanguage, sourceLanguage = 'English') {
-    const prompt = this.buildPrompt(items, targetLanguage, sourceLanguage);
+    const prompt = this.buildPrompt(items, targetLanguage, sourceLanguage, this.config.appContext);
     const rawResponse = await this.makeRequest(prompt);
     return this.parseResponse(rawResponse, items.length);
   }

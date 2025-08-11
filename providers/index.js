@@ -4,6 +4,8 @@ const OpenAIProvider = require('./openai');
 const ClaudeProvider = require('./claude');
 const DeepSeekProvider = require('./deepseek');
 const ReplicateProvider = require('./replicate');
+const PerplexityProvider = require('./perplexity');
+const GrokProvider = require('./grok');
 
 function createProvider(config) {
   switch (config.aiProvider.toLowerCase()) {
@@ -17,8 +19,12 @@ function createProvider(config) {
       return new DeepSeekProvider(config);
     case 'replicate':
       return new ReplicateProvider(config);
+    case 'perplexity':
+      return new PerplexityProvider(config);
+    case 'grok':
+      return new GrokProvider(config);
     default:
-      throw new Error(`Unsupported AI provider: ${config.aiProvider}. Supported providers: gemini, openai, claude, deepseek, replicate`);
+      throw new Error(`Unsupported AI provider: ${config.aiProvider}. Supported providers: gemini, openai, claude, deepseek, replicate, perplexity, grok`);
   }
 }
 

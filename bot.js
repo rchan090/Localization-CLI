@@ -54,9 +54,18 @@ async function translateBatch(provider, batch, targetLanguage, sourceLanguage) {
       TARGET_LANG_NAME = languages.targetName;
     }
 
+    // Prompt for app context if not configured
+    if (!config.appContext) {
+      CLIUtils.printInfo('Setting up application context...');
+      config.appContext = await CLIUtils.promptForAppContext();
+    }
+
     // Create AI provider
     const provider = createProvider(config);
     CLIUtils.printInfo(`Using AI provider: ${config.aiProvider.toUpperCase()}`);
+    if (config.appContext) {
+      CLIUtils.printInfo(`App context: ${config.appContext}`);
+    }
 
     // Check if file path is configured
     if (!config.filePath || !fs.existsSync(config.filePath)) {
@@ -139,38 +148,59 @@ async function translateBatch(provider, batch, targetLanguage, sourceLanguage) {
       provider: config.aiProvider.toUpperCase()
     };
 
-    for (const chunk of chunks) {
-      try {
-        const translations = await translateBatch(provider, chunk, TARGET_LANG_NAME, SOURCE_LANG_NAME);
+    async function processChunkWithRetry(chunk, chunkIndex) {
+      const maxRetries = config.retryCount || 3;
+      let lastError = null;
 
-        translations.forEach((trValue, idx) => {
-          const { key, sourceText } = chunk[idx];
-          
-          // Update statistics
-          stats.success++;
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          if (attempt > 1) {
+            CLIUtils.printInfo(`Retrying chunk ${chunkIndex + 1} (attempt ${attempt}/${maxRetries})`);
+            // Add delay before retry
+            await new Promise(resolve => setTimeout(resolve, config.requestDelay || 1000));
+          }
 
-          // Update the strings object
-          if (!strings[key].localizations) strings[key].localizations = {};
-          strings[key].localizations[TARGET_LANG_CODE] = {
-            stringUnit: {
-              state: 'translated',
-              value: trValue
-            }
-          };
-        });
+          const translations = await translateBatch(provider, chunk, TARGET_LANG_NAME, SOURCE_LANG_NAME);
 
-        processed += chunk.length;
-        progressBar.update(processed);
+          translations.forEach((trValue, idx) => {
+            const { key, sourceText } = chunk[idx];
+            
+            // Update statistics
+            stats.success++;
 
-      } catch (error) {
-        CLIUtils.printError(`Failed to translate chunk: ${error.message}`);
-        // Mark chunk items as failed
-        chunk.forEach(() => {
-          stats.errors++;
-          processed++;
-        });
-        progressBar.update(processed);
+            // Update the strings object
+            if (!strings[key].localizations) strings[key].localizations = {};
+            strings[key].localizations[TARGET_LANG_CODE] = {
+              stringUnit: {
+                state: 'translated',
+                value: trValue
+              }
+            };
+          });
+
+          return true; // Success
+        } catch (error) {
+          lastError = error;
+          if (attempt < maxRetries) {
+            CLIUtils.printWarning(`Chunk ${chunkIndex + 1} failed (attempt ${attempt}/${maxRetries}): ${error.message}`);
+          }
+        }
       }
+
+      // All retries failed
+      CLIUtils.printError(`Failed to translate chunk ${chunkIndex + 1} after ${maxRetries} attempts: ${lastError.message}`);
+      chunk.forEach(() => {
+        stats.errors++;
+      });
+      return false; // Failed
+    }
+
+    for (let i = 0; i < chunks.length; i++) {
+      const chunk = chunks[i];
+      await processChunkWithRetry(chunk, i);
+      
+      processed += chunk.length;
+      progressBar.update(processed);
     }
 
     progressBar.stop();

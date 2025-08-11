@@ -8,24 +8,28 @@ class BaseProvider {
     throw new Error('translate method must be implemented by subclasses');
   }
 
-  buildPrompt(items, targetLangName, sourceLangName = 'English') {
+  buildPrompt(items, targetLangName, sourceLangName = 'English', appContext = '') {
     const inputArray = items.map(i => i.sourceText);
     const inputJson = JSON.stringify(inputArray);
     const expectedCount = items.length;
     
+    const contextLine = appContext ? 
+      `You are translating UI strings for a ${appContext}. ` : '';
+    
     return [
-      `You are a professional localization assistant. Translate each ${sourceLangName} UI string to ${targetLangName}, positionally aligned.`,
+      `You are a professional localization assistant. ${contextLine}Translate each ${sourceLangName} UI string to ${targetLangName}, positionally aligned.`,
       'Rules:',
       '- Keep all placeholder tokens unchanged and in the exact position: %@, %1$@, %2$@, %lld, %@x, {name}, [count], etc.',
       '- Preserve punctuation, ellipses, newlines, quotes style, and spacing.',
       `- If the ${sourceLangName} string is ALL CAPS, return ${targetLangName} also in ALL CAPS.`,
       '- Maintain the same tone and formality level as the source.',
       '- For UI elements, keep translations concise and appropriate for interface constraints.',
+      appContext ? `- Consider the context of a ${appContext} when choosing appropriate terminology and tone.` : '',
       `Return ONLY a valid JSON array of strings with exactly ${expectedCount} items, in the same order as the input. No code fences, no labels, no extra text.`,
       '',
       'INPUT_JSON:',
       inputJson
-    ].join('\n');
+    ].filter(line => line !== '').join('\n');
   }
 
   parseResponse(rawResponse, expectedCount) {
